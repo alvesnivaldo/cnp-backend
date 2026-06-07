@@ -111,6 +111,60 @@ app.get("/teste", async (req, res) => {
   }
 });
 
+app.get("/hotmart-webhook", (req, res) => {
+  res.json({
+    webhook: "ok"
+  });
+});
+
+// ===== HOTMART WEBHOOK =====
+
+app.post("/hotmart-webhook", async (req, res) => {
+  try {
+
+    console.log("Webhook Hotmart:", req.body);
+
+    const email =
+      req.body?.data?.buyer?.email ||
+      req.body?.buyer?.email ||
+      req.body?.email;
+
+    if (!email) {
+      return res.status(400).json({
+        erro: "Email não encontrado"
+      });
+    }
+
+    const { error } = await supabase
+      .from("usuarios")
+      .upsert({
+        email,
+        assinante: 1,
+        data_pagamento: new Date().toISOString()
+      });
+
+    if (error) {
+      console.error(error);
+
+      return res.status(500).json(error);
+    }
+
+    res.json({
+      sucesso: true,
+      email
+    });
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+      erro: err.message
+    });
+
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
