@@ -14,7 +14,7 @@ function App() {
   const LIMITE_TESTE = 20;
 
   // 🔐 LOGIN
-  function fazerLogin() {
+  async function fazerLogin() {
     const usuarios =
       JSON.parse(localStorage.getItem("usuarios")) || [];
 
@@ -31,15 +31,35 @@ function App() {
    );
 
    if (usuarioEncontrado) {
-     localStorage.setItem("logado", "true");
 
-     localStorage.setItem(
-       "usuarioLogado",
-       usuarioEncontrado.email
-     );
-     alert("✅ Login realizado com sucesso!");
-     setScreen("home");
-   } 
+  localStorage.setItem("logado", "true");
+
+  localStorage.setItem(
+    "usuarioLogado",
+    usuarioEncontrado.email
+  );
+
+  try {
+
+    const resposta = await fetch(
+      `https://cnp-backend.vercel.app/assinante/${usuarioEncontrado.email}`
+    );
+
+    const dados = await resposta.json();
+
+    if (dados.assinante === 1) {
+      localStorage.setItem("assinanteAtivo", "true");
+    } else {
+      localStorage.setItem("assinanteAtivo", "false");
+    }
+
+  } catch (erro) {
+    console.error(erro);
+  }
+
+  alert("✅ Login realizado com sucesso!");
+  setScreen("home");
+}
      else {
      alert("❌ E-mail ou senha incorretos");
    }
