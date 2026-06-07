@@ -111,10 +111,61 @@ app.get("/teste", async (req, res) => {
   }
 });
 
-app.get("/hotmart-webhook", (req, res) => {
-  res.json({
-    webhook: "ok"
-  });
+app.post("/hotmart-webhook", async (req, res) => {
+  try {
+    const evento = req.body.event;
+    const email = req.body?.data?.buyer?.email;
+
+    console.log("Evento:", evento);
+    console.log("Email:", email);
+
+    if (!email) {
+      return res.status(400).json({
+        erro: "Email não encontrado"
+      });
+    }
+
+    // Compra aprovada ou completa
+    if (
+      evento === "PURCHASE_APPROVED" ||
+      evento === "PURCHASE_COMPLETE"
+    ) {
+      const { error } = await supabase
+        .from("usuarios")
+        .upsert({
+          email,
+          assinante: 1,
+          data_pagamento: new Date().toISOString()
+        });
+
+      if (error) {
+        return res.status(500).json(error);
+      }
+    }
+
+    // Compra reembolsada
+    if (evento === "PURCHASE_REFUNDED") {
+      const { error } = await supabase
+        .from("usuarios")
+        .update({
+          assinante: 0
+        })
+        .eq("email", email);
+
+      if (error) {
+        return res.status(500).json(error);
+      }
+    }
+
+    res.json({
+      sucesso: true
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      erro: err.message
+    });
+  }
 });
 
 // ===== HOTMART WEBHOOK =====
