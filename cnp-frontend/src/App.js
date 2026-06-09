@@ -632,14 +632,14 @@ function App() {
 
         <h2>💰 Plano único</h2>
 
-        <h3>Mensal</h3>
+        <h3>60 dias de acesso</h3>
 
         <div style={plans}>
 
           <div style={cardPrimary}>
 
             <p style={{ fontSize: 20, fontWeight: "bold" }}>
-           👉 Acesso completo por apenas
+           👉 Acesso completo por 60 dias
             </p>
 
             <p style={{ fontSize: 30, fontWeight: "bold" }}>
