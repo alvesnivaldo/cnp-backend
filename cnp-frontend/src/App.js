@@ -630,7 +630,7 @@ function App() {
       {/* PLANOS */}
       <div style={section}>
 
-        <h2>🔥 TESTE NIVALDO 123 🔥</h2>
+        <h2>💰 Plano único</h2>
 
         <h3>60 dias de acesso</h3>
 
