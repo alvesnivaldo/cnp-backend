@@ -110,18 +110,19 @@ app.get("/assinante/:email", async (req, res) => {
 
 app.get("/teste", async (req, res) => {
   try {
+
+    const hoje = new Date();
+
+    const expiracao = new Date();
+    expiracao.setDate(expiracao.getDate() + 60);
+
     const { error } = await supabase
       .from("usuarios")
       .upsert({
         email: "cnp.concursos.planos@gmail.com",
         assinante: 1,
-const hoje = new Date();
-
-const expiracao = new Date();
-expiracao.setDate(expiracao.getDate() + 60);
-
-data_pagamento: hoje.toISOString(),
-data_expiracao: expiracao.toISOString()
+        data_pagamento: hoje.toISOString(),
+        data_expiracao: expiracao.toISOString()
       });
 
     if (error) {
