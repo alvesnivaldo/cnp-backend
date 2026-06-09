@@ -42,13 +42,19 @@ app.post("/assinante", async (req, res) => {
   try {
     const { email } = req.body;
 
-    const { error } = await supabase
-      .from("usuarios")
-      .upsert({
-        email,
-        assinante: 1,
-        data_pagamento: new Date().toISOString()
-      });
+    const hoje = new Date();
+
+const expiracao = new Date();
+expiracao.setDate(expiracao.getDate() + 60);
+
+const { error } = await supabase
+  .from("usuarios")
+  .upsert({
+    email,
+    assinante: 1,
+    data_pagamento: hoje.toISOString(),
+    data_expiracao: expiracao.toISOString()
+  });
 
     if (error) {
       return res.status(500).json(error);
@@ -79,6 +85,21 @@ app.get("/assinante/:email", async (req, res) => {
       return res.json({});
     }
 
+    if (
+  data.data_expiracao &&
+  new Date() > new Date(data.data_expiracao)
+) {
+
+  await supabase
+    .from("usuarios")
+    .update({
+      assinante: 0
+    })
+    .eq("email", email);
+
+  data.assinante = 0;
+}
+
     res.json(data);
   } catch (err) {
     res.status(500).json({
@@ -94,7 +115,13 @@ app.get("/teste", async (req, res) => {
       .upsert({
         email: "cnp.concursos.planos@gmail.com",
         assinante: 1,
-        data_pagamento: new Date().toISOString()
+const hoje = new Date();
+
+const expiracao = new Date();
+expiracao.setDate(expiracao.getDate() + 60);
+
+data_pagamento: hoje.toISOString(),
+data_expiracao: expiracao.toISOString()
       });
 
     if (error) {
@@ -130,13 +157,19 @@ app.post("/hotmart-webhook", async (req, res) => {
       evento === "PURCHASE_APPROVED" ||
       evento === "PURCHASE_COMPLETE"
     ) {
-      const { error } = await supabase
-        .from("usuarios")
-        .upsert({
-          email,
-          assinante: 1,
-          data_pagamento: new Date().toISOString()
-        });
+      const hoje = new Date();
+
+const expiracao = new Date();
+expiracao.setDate(expiracao.getDate() + 60);
+
+const { error } = await supabase
+  .from("usuarios")
+  .upsert({
+    email,
+    assinante: 1,
+    data_pagamento: hoje.toISOString(),
+    data_expiracao: expiracao.toISOString()
+  });
 
       if (error) {
         return res.status(500).json(error);
